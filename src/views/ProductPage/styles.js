@@ -7,7 +7,7 @@ export const ProductPageContainer = styled.div`
 export const ProductPageTopContainer = styled.div`
   padding-top: 64px;
   max-width: 1300px;
-  padding: 80px 40px 40px;
+  padding: 0 40px 40px;
   background-color: #f5f5f4;
   margin-left: auto;
   margin-right: auto;

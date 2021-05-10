@@ -3,8 +3,9 @@ import CartImg from '../../images/cart.png'
 
 export const HeaderContainer = styled.div`
   top: 0;
+  position: -webkit-sticky;
+  position: sticky;
   width: 100%;
-  position: absolute;
   background-color: #f5f5f4;
   box-shadow: 0 2px 3px -3px grey;
   z-index: 1;
