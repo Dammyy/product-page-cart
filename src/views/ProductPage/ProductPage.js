@@ -1,5 +1,7 @@
-import React from 'react'
-import Header from '../Header'
+import React, { useState, useEffect } from 'react'
+import { useQuery, useReactiveVar } from '@apollo/client'
+import { selectedCurrencyVar } from '../../GraphQL/cache'
+import { PRODUCTS } from '../../GraphQL/queries'
 import {
   ProductPageContainer,
   ProductPageTopContainer,
@@ -15,9 +17,21 @@ import {
 } from './styles'
 
 export const ProductPage = () => {
+  const selectedCurrency = useReactiveVar(selectedCurrencyVar)
+  const { loading, data } = useQuery(PRODUCTS, {
+    variables: { currency: selectedCurrency },
+  })
+
+  const [productsData, setProductsData] = useState(data)
+
+  useEffect(() => {
+    if (!loading) {
+      setProductsData(data)
+    }
+  }, [loading, data])
+
   return (
     <ProductPageContainer>
-      <Header />
       <ProductPageTopContainer>
         <ProductPageTopInner>
           <ProductPageTitle>
@@ -38,58 +52,27 @@ export const ProductPage = () => {
       </ProductPageTopContainer>
       <ProductListContainer>
         <ProductList>
-          <ProductItem>
-            <ImageTitle>
-              <img
-                src="https://cdn.shopify.com/s/files/1/2960/5204/products/age-management_1024x1024_ad6e7a36-7242-469c-9fb5-242f5ee9c83f_1024x1024.png?v=1602809968"
-                alt=""
-              />
-              <h2>Age Mangement Set</h2>
-            </ImageTitle>
-            <ProductPrice>
-              From: <span>NGN 20,0000</span>
-            </ProductPrice>
-            <AddToCartButton>Add To Cart</AddToCartButton>
-          </ProductItem>
-          <ProductItem>
-            <ImageTitle>
-              <img
-                src="https://cdn.shopify.com/s/files/1/2960/5204/products/age-management_1024x1024_ad6e7a36-7242-469c-9fb5-242f5ee9c83f_1024x1024.png?v=1602809968"
-                alt=""
-              />
-              <h2>Age Mangement Set</h2>
-            </ImageTitle>
-            <ProductPrice>
-              From: <span>NGN 20,0000</span>
-            </ProductPrice>
-            <AddToCartButton>Add To Cart</AddToCartButton>
-          </ProductItem>
-          <ProductItem>
-            <ImageTitle>
-              <img
-                src="https://cdn.shopify.com/s/files/1/2960/5204/products/age-management_1024x1024_ad6e7a36-7242-469c-9fb5-242f5ee9c83f_1024x1024.png?v=1602809968"
-                alt=""
-              />
-              <h2>Age Mangement Set</h2>
-            </ImageTitle>
-            <ProductPrice>
-              From: <span>NGN 20,0000</span>
-            </ProductPrice>
-            <AddToCartButton>Add To Cart</AddToCartButton>
-          </ProductItem>
-          <ProductItem>
-            <ImageTitle>
-              <img
-                src="https://cdn.shopify.com/s/files/1/2960/5204/products/age-management_1024x1024_ad6e7a36-7242-469c-9fb5-242f5ee9c83f_1024x1024.png?v=1602809968"
-                alt=""
-              />
-              <h2>Age Mangement Set</h2>
-            </ImageTitle>
-            <ProductPrice>
-              From: <span>NGN 20,0000</span>
-            </ProductPrice>
-            <AddToCartButton>Add To Cart</AddToCartButton>
-          </ProductItem>
+          {productsData ? (
+            productsData.products.map((product) => {
+              return (
+                <ProductItem>
+                  <ImageTitle>
+                    <img src={product.image_url} alt="" />
+                    <h2>{product.title}</h2>
+                  </ImageTitle>
+                  <ProductPrice>
+                    From:{' '}
+                    <span>
+                      {selectedCurrency} {product.price}
+                    </span>
+                  </ProductPrice>
+                  <AddToCartButton>Add To Cart</AddToCartButton>
+                </ProductItem>
+              )
+            })
+          ) : (
+            <div>Loading...</div>
+          )}
         </ProductList>
       </ProductListContainer>
     </ProductPageContainer>

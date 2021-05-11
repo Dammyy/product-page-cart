@@ -1,4 +1,4 @@
-div, h1, span, p {
+div, h1, span, p, body, html {
   margin: 0;
   padding: 0;
 }

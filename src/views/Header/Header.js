@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useQuery, useReactiveVar } from '@apollo/client'
+import Cart from '../Cart'
+import { PRODUCTS, CURRENCIES } from '../../GraphQL/queries'
+import { selectedCurrencyVar } from '../../GraphQL/cache'
 import {
   HeaderContainer,
   HeaderInner,
   HeaderInnerRight,
-  CurrencySelect,
   CartCurrency,
   CartContainer,
   CartIcon,
@@ -11,25 +14,47 @@ import {
 } from './styles'
 
 const Header = () => {
+  const selectedCurrency = useReactiveVar(selectedCurrencyVar)
+  const { error } = useQuery(CURRENCIES)
+  const { error1, refetch } = useQuery(PRODUCTS, {
+    variables: { currency: selectedCurrency },
+    fetchPolicy: 'no-cache',
+  })
+
+  const isError = error || error1
+
+  const [isPaneOpen, setIsPaneOpen] = useState(false)
+
+  const handlePaneClose = () => {
+    setIsPaneOpen(false)
+  }
+  const handlePaneOpen = () => {
+    setIsPaneOpen(true)
+  }
+
+  if (isError) return <p>Error :(</p>
+
   return (
-    <HeaderContainer>
-      <HeaderInner>
-        <div></div>
-        <HeaderInnerRight>
-          <CartCurrency>
-            <CartContainer>
-              <CartIcon />
-              <CartItemCount>0</CartItemCount>
-            </CartContainer>
-            <CurrencySelect name="currency" id="currency">
-              <option value="volvo">EN</option>
-              <option value="saab">AR</option>
-              <option value="opel">FR</option>
-            </CurrencySelect>
-          </CartCurrency>
-        </HeaderInnerRight>
-      </HeaderInner>
-    </HeaderContainer>
+    <>
+      <Cart
+        open={isPaneOpen}
+        handleClose={handlePaneClose}
+        refetchProducts={refetch}
+      />
+      <HeaderContainer isPaneOpen={isPaneOpen}>
+        <HeaderInner>
+          <div></div>
+          <HeaderInnerRight>
+            <CartCurrency>
+              <CartContainer>
+                <CartIcon onClick={handlePaneOpen} />
+                <CartItemCount>0</CartItemCount>
+              </CartContainer>
+            </CartCurrency>
+          </HeaderInnerRight>
+        </HeaderInner>
+      </HeaderContainer>
+    </>
   )
 }
 
