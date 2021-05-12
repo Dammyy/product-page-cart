@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useQuery, useReactiveVar } from '@apollo/client'
-import { selectedCurrencyVar } from '../../GraphQL/cache'
-import { PRODUCTS } from '../../GraphQL/queries'
+import { useQuery } from '@apollo/client'
+import { PRODUCTS, GET_CART_ITEMS, GET_SELECTED_CURRENCY, GET_PRODUCTS } from '../../GraphQL/queries'
+import client from '../../GraphQL/client'
 import {
   ProductPageContainer,
   ProductPageTopContainer,
@@ -17,10 +17,18 @@ import {
 } from './styles'
 
 export const ProductPage = () => {
-  const selectedCurrency = useReactiveVar(selectedCurrencyVar)
+  const { selectedCurrency } = client.readQuery({
+    query: GET_SELECTED_CURRENCY,
+  })
+
   const { loading, data } = useQuery(PRODUCTS, {
     variables: { currency: selectedCurrency },
   })
+  // const { products } = client.readQuery({
+  //   query: GET_PRODUCTS,
+  // })
+
+  // console.log('Here, Product page', products, data)
 
   const [productsData, setProductsData] = useState(data)
 
@@ -29,6 +37,21 @@ export const ProductPage = () => {
       setProductsData(data)
     }
   }, [loading, data])
+
+  const addToCart = (product) => {
+    const { cartItems } = client.readQuery({
+      query: GET_CART_ITEMS,
+    })
+
+    // console.log('cart items', items)
+
+    client.writeQuery({
+      query: GET_CART_ITEMS,
+      data: {
+        cartItems: [...cartItems, { product }],
+      },
+    })
+  }
 
   return (
     <ProductPageContainer>
@@ -66,7 +89,9 @@ export const ProductPage = () => {
                       {selectedCurrency} {product.price}
                     </span>
                   </ProductPrice>
-                  <AddToCartButton>Add To Cart</AddToCartButton>
+                  <AddToCartButton onClick={() => addToCart(product)}>
+                    Add To Cart
+                  </AddToCartButton>
                 </ProductItem>
               )
             })

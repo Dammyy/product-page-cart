@@ -1,23 +1,27 @@
-import { InMemoryCache, makeVar } from '@apollo/client'
+import { InMemoryCache } from '@apollo/client'
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist'
+import { GET_CART_ITEMS, GET_SELECTED_CURRENCY, GET_PRODUCTS } from './queries'
+export const cache = new InMemoryCache({})
 
-export const cache = new InMemoryCache({
-  typePolicies: {
-    Query: {
-      fields: {
-        cartItems: {
-          read() {
-            return cartItemsVar()
-          },
-        },
-        selectedCurrency: {
-          read() {
-            return selectedCurrencyVar()
-          },
-        },
-      },
-    },
+cache.writeQuery({
+  query: GET_CART_ITEMS,
+  data: {
+    cartItems: [],
   },
 })
 
-export const cartItemsVar = makeVar([])
-export const selectedCurrencyVar = makeVar('NGN')
+cache.writeQuery({
+  query: GET_SELECTED_CURRENCY,
+  data: {
+    selectedCurrency: 'NGN',
+  },
+})
+
+async function persistStuff() {
+  await persistCache({
+    cache,
+    trigger: 'write',
+    storage: new LocalStorageWrapper(window.localStorage),
+  })
+}
+persistStuff()

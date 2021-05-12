@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { useQuery, useReactiveVar } from '@apollo/client'
+import React, { useState, useEffect } from 'react'
+import { useQuery } from '@apollo/client'
 import Cart from '../Cart'
-import { PRODUCTS, CURRENCIES } from '../../GraphQL/queries'
-import { selectedCurrencyVar } from '../../GraphQL/cache'
+import { PRODUCTS, CURRENCIES, GET_CART_ITEMS, GET_SELECTED_CURRENCY } from '../../GraphQL/queries'
+import client from '../../GraphQL/client'
 import {
   HeaderContainer,
   HeaderInner,
@@ -14,9 +14,12 @@ import {
 } from './styles'
 
 const Header = () => {
-  const selectedCurrency = useReactiveVar(selectedCurrencyVar)
   const { error } = useQuery(CURRENCIES)
-  const { error1, refetch } = useQuery(PRODUCTS, {
+  const { selectedCurrency } = client.readQuery({
+    query: GET_SELECTED_CURRENCY,
+  })
+  console.log('SELECTED CURRENCY HEADER', selectedCurrency)
+  const { data, loading, error1, refetch } = useQuery(PRODUCTS, {
     variables: { currency: selectedCurrency },
     fetchPolicy: 'no-cache',
   })
@@ -32,7 +35,29 @@ const Header = () => {
     setIsPaneOpen(true)
   }
 
+  const { cartItems } = client.readQuery({
+    query: GET_CART_ITEMS,
+  })
+
+  const updateCartPrice = (products) => {
+    const updatedCart = cartItems.map((item) =>
+      products.find((product) => product.id === item.product.id)
+    )
+    // console.log('UPDATED CART', updatedCart)
+  }
+
+  useEffect(() => {
+    if (!loading && data) {
+      // console.log('NEW PRODUCTS', data.products, cartItems)
+      updateCartPrice(data.products)
+    }
+  }, [loading, data])
+
   if (isError) return <p>Error :(</p>
+
+  // const { data1 } = useQuery(PRODUCTS, {
+  //   variables: { currency: selectedCurrency },
+  // })
 
   return (
     <>

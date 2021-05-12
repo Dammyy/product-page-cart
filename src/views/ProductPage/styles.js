@@ -79,6 +79,7 @@ export const ImageTitle = styled.div`
   img {
     max-width: 100%;
     max-height: 170px;
+    object-fit: contain;
   }
 
   h2 {
