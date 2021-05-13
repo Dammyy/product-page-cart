@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/client'
 import Cart from '../Cart'
 import { CURRENCIES, CART_ITEMS } from '../../GraphQL/queries'
-import client from '../../GraphQL/client'
 import {
   HeaderContainer,
   HeaderInner,

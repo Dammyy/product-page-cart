@@ -45,17 +45,43 @@ export const ProductPage = () => {
   }, [loading, data])
 
   const addToCart = (product) => {
+    let isExists = false
     const { cartItems } = client.readQuery({
       query: CART_ITEMS,
+    })
+
+    const updatedCart = cartItems.map((item) => {
+      const findItem = cartItems.find((item) => item.product.id === product.id)
+      if (findItem) {
+        isExists = true
+        const newQuantity = findItem.quantity + 1
+        return {
+          ...findItem,
+          product: {
+            ...findItem.product,
+            price: newQuantity * findItem.unitPrice,
+          },
+          quantity: newQuantity,
+        }
+      }
+
+      return item
     })
 
     client.writeQuery({
       query: CART_ITEMS,
       data: {
-        cartItems: [
-          ...cartItems,
-          { id: Date.now(), product, quantity: 1, unitPrice: product.price },
-        ],
+        cartItems: isExists
+          ? updatedCart
+          : [
+              ...cartItems,
+              {
+                id: Date.now(),
+                product,
+                quantity: 1,
+                unitPrice: product.price,
+              },
+            ],
       },
     })
   }
