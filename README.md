@@ -7,6 +7,9 @@
  - Decrement Quantity
  - Change Currency
 
+## Live Demo
+ - https://product-page-cart.herokuapp.com/ 
+
 ### `yarn start`
 
 Runs the app in the development mode.\
