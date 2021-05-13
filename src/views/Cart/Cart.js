@@ -22,12 +22,13 @@ import {
   CartItemCount,
   CartItemPrice,
   RemoveFromCart,
+  SubTotalContainer,
+  StyledSubTotal,
+  SumTotal,
 } from './styles'
 
-const Cart = (props) => {
-  const { open, handleClose, refetchProducts, products } = props
+const Cart = ({ open, handleClose, refetchProducts }) => {
   const { data } = useQuery(CURRENCIES)
-
   const { selectedCurrency } = client.readQuery({
     query: GET_SELECTED_CURRENCY,
   })
@@ -42,6 +43,13 @@ const Cart = (props) => {
     setCartItems(items ? items.cartItems : [])
   }, [items])
 
+  const sunCartItems = () => {
+    let totalPrice = 0
+    cartItems.map((item) => {
+      return (totalPrice += item.product.price)
+    })
+    return totalPrice
+  }
   const onCurrencySelect = async (event) => {
     const selected = event.target.value
 
@@ -119,14 +127,14 @@ const Cart = (props) => {
           value={selectedCurrency}
         >
           {data &&
-            data.currency.map((curr) => <option value={curr}>{curr}</option>)}
+            data.currency.map((curr) => <option key={curr} value={curr}>{curr}</option>)}
         </CurrencySelect>
         <CartItemsContainer>
           {cartItems?.length === 0 ? (
-            <p class="empty-message">There are no items in your cart.</p>
+            <p className="empty-message">There are no items in your cart.</p>
           ) : (
             cartItems.map((item) => (
-              <CartItem>
+              <CartItem key={item.id}>
                 <CartItemDetails>
                   <CartItemTitle>
                     <h6>{item.product.title}</h6>
@@ -135,7 +143,9 @@ const Cart = (props) => {
                     <CartItemCounterContainer>
                       <CartItemStep
                         onClick={() =>
-                          updateQuantity(item.quantity - 1, item.id)
+                          item.quantity === 1
+                            ? removeFromCart(item.id)
+                            : updateQuantity(item.quantity - 1, item.id)
                         }
                       >
                         -
@@ -165,6 +175,12 @@ const Cart = (props) => {
           )}
         </CartItemsContainer>
       </div>
+      <SubTotalContainer>
+        <StyledSubTotal>Subtotal</StyledSubTotal>
+        <SumTotal>
+          {selectedCurrency} {sunCartItems()}
+        </SumTotal>
+      </SubTotalContainer>
     </StyledSlidingPane>
   )
 }

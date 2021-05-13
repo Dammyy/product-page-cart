@@ -24,6 +24,11 @@ export const StyledSlidingPane = styled(SlidingPane)`
     overflow-y: auto;
     padding: 0 16px;
     flex: 1 1 auto;
+    margin-bottom: 55px;
+  }
+
+  @media (max-width: 480px) {
+    width: 90% !important;
   }
 `
 
@@ -61,6 +66,10 @@ export const CartItem = styled.div`
   display: flex;
   justify-content: space-between;
   position: relative;
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 `
 
 export const CartItemDetails = styled.div`
@@ -85,6 +94,7 @@ export const CartItemImage = styled.div`
 
   img {
     height: 80px;
+    max-width: 100%;
   }
 `
 
@@ -136,4 +146,30 @@ export const RemoveFromCart = styled.div`
   margin-right: 12px;
   margin-top: -10px;
   cursor: pointer;
+`
+
+export const SubTotalContainer = styled.div`
+  height: 55px;
+  background-color: #f2f2ef;
+  z-index: 1;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #d0d0d0;
+  box-shadow: 0 -4px 12px rgb(0 0 0 / 15%);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  box-sizing: border-box;
+`
+
+export const StyledSubTotal = styled.div`
+  font-size: 13px;
+`
+
+export const SumTotal = styled.div`
+  font-size: 16px;
+  font-weight: bold;
 `

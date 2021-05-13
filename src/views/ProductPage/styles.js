@@ -21,6 +21,12 @@ export const ProductPageTopInner = styled.div`
   height: 96px;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 768px) {
+    height: auto;
+    flex-direction: column;
+    padding: 40px 0px 32px;
+  }
 `
 
 export const ProductPageTitle = styled.div`
@@ -48,6 +54,9 @@ export const CategorySelect = styled.select`
   padding-left: 20px;
   padding-right: 32px;
   font-size: 16px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `
 
 export const ProductListContainer = styled.div`
@@ -61,6 +70,10 @@ export const ProductList = styled.div`
   margin-left: auto;
   margin-right: auto;
   min-height: 500px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: auto auto;
+  }
 `
 
 export const ProductItem = styled.div`
@@ -69,6 +82,14 @@ export const ProductItem = styled.div`
   padding: 48px 32px;
   text-align: center;
   align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px 4px;
+  }
 `
 
 export const ImageTitle = styled.div`
@@ -88,6 +109,13 @@ export const ImageTitle = styled.div`
     margin: 8px 0;
     font-weight: 400;
   }
+
+  @media (max-width: 480px) {
+    img {
+      width: 150px;
+      align-self: center;
+    }
+  }
 `
 
 export const ProductPrice = styled.div`
@@ -98,12 +126,16 @@ export const ProductPrice = styled.div`
   span {
     margin-left: 4px;
   }
+  @media (max-width: 480px) {
+    font-size: 14px;
+    text-align: center;
+  }
 `
 
 export const AddToCartButton = styled.button`
   margin-top: 8px;
-  max-width: 157px;
-  min-width: 190px;
+  width: 100%;
+  max-width: 100%;
   font-weight: 600;
   outline: none;
   border: 0px;
@@ -112,4 +144,8 @@ export const AddToCartButton = styled.button`
   min-height: 52px;
   background: rgb(75, 85, 72);
   color: rgb(252, 252, 249);
+
+  @media (max-width: 480px) {
+    padding: 16px 4px;
+  }
 `

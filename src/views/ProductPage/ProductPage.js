@@ -22,6 +22,16 @@ import {
 } from './styles'
 
 export const ProductPage = () => {
+  const [isPaneOpen, setIsPaneOpen] = useState(false)
+
+  const handlePaneClose = () => {
+    setIsPaneOpen(false)
+  }
+
+  const handlePaneOpen = () => {
+    setIsPaneOpen(true)
+  }
+
   const { selectedCurrency } = client.readQuery({
     query: GET_SELECTED_CURRENCY,
   })
@@ -51,9 +61,11 @@ export const ProductPage = () => {
     })
 
     const updatedCart = cartItems.map((item) => {
-      const findItem = cartItems.find((item) => item.product.id === product.id)
-      if (findItem) {
+      if (item.product.id === product.id) {
         isExists = true
+        const findItem = cartItems.find(
+          (item) => item.product.id === product.id
+        )
         const newQuantity = findItem.quantity + 1
         return {
           ...findItem,
@@ -64,7 +76,6 @@ export const ProductPage = () => {
           quantity: newQuantity,
         }
       }
-
       return item
     })
 
@@ -84,6 +95,7 @@ export const ProductPage = () => {
             ],
       },
     })
+    setIsPaneOpen(true)
   }
 
   const updateCartPrice = (data) => {
@@ -128,6 +140,10 @@ export const ProductPage = () => {
         refetch={refetchProducts}
         products={data}
         selectedCurrency={selectedCurrency}
+        isPaneOpen={isPaneOpen}
+        setIsPaneOpen={setIsPaneOpen}
+        handlePaneClose={handlePaneClose}
+        handlePaneOpen={handlePaneOpen}
       />
       <ProductPageContainer>
         <ProductPageTopContainer>
@@ -153,7 +169,7 @@ export const ProductPage = () => {
             {productsData ? (
               productsData.products.map((product) => {
                 return (
-                  <ProductItem>
+                  <ProductItem key={product.id}>
                     <ImageTitle>
                       <img src={product.image_url} alt="" />
                       <h2>{product.title}</h2>

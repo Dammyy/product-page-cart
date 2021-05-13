@@ -38,25 +38,3 @@ export const GET_SELECTED_CURRENCY = gql`
     selectedCurrency @client
   }
 `
-
-export const GET_CURRENCIES = gql`
-  query GetCurrencies {
-    currency @client
-  }
-`
-
-export const GET_PRODUCTS = gql`
-  query GetProducts {
-    products @client {
-      id
-      title
-      image_url
-      price(currency: $currency)
-      product_options {
-        title
-        prefix
-        suffix
-      }
-    }
-  }
-`
