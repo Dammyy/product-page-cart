@@ -1,7 +1,7 @@
 import { InMemoryCache } from '@apollo/client'
 import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist'
-import { GET_CART_ITEMS, GET_SELECTED_CURRENCY, GET_PRODUCTS } from './queries'
-export const cache = new InMemoryCache({})
+import { GET_CART_ITEMS, GET_SELECTED_CURRENCY } from './queries'
+export const cache = new InMemoryCache()
 
 cache.writeQuery({
   query: GET_CART_ITEMS,

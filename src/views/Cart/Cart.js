@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useQuery } from '@apollo/client'
 import CloseIcon from './CloseIcon'
 import {
   CURRENCIES,
   GET_CART_ITEMS,
-  PRODUCTS,
   GET_SELECTED_CURRENCY,
 } from '../../GraphQL/queries'
 import client from '../../GraphQL/client'
@@ -32,16 +31,13 @@ const Cart = (props) => {
     query: GET_SELECTED_CURRENCY,
   })
 
-  // const [activeCurrency, setActiveCurrency] = useState(selectedCurrency)
-  console.log('SELECTED CURRENCY MAIN CART', selectedCurrency)
-  const { cartItems } = client.readQuery({
+  const items = client.readQuery({
     query: GET_CART_ITEMS,
   })
 
-  const onCurrencySelect = (event) => {
+  const onCurrencySelect = async (event) => {
     const selected = event.target.value
 
-    console.log('SELECTED CURRENCY cart', selected)
     client.writeQuery({
       query: GET_SELECTED_CURRENCY,
       data: {
@@ -49,10 +45,9 @@ const Cart = (props) => {
       },
     })
 
-    refetchProducts({ currency: selected })
+    await refetchProducts(selected)
   }
 
-  // console.log('ITEMS', cartItems)
   return (
     <StyledSlidingPane
       className="slide-pane-open"
@@ -73,10 +68,11 @@ const Cart = (props) => {
             data.currency.map((curr) => <option value={curr}>{curr}</option>)}
         </CurrencySelect>
         <CartItemsContainer>
-          {cartItems?.length === 0 ? (
+          {items && items.cartItems?.length === 0 ? (
             <p class="empty-message">There are no items in your cart.</p>
           ) : (
-            cartItems.map((item) => (
+            items &&
+            items.cartItems.map((item) => (
               <CartItem>
                 <CartItemDetails>
                   <CartItemTitle>
@@ -104,18 +100,3 @@ const Cart = (props) => {
 }
 
 export default Cart
-
-// onClick={() =>
-//   isInCart(product.id)
-//     ? removeFromCart(product.id)
-//     : addToCart(product.id)
-// }
-
-// const removeFromCart = (event) => {
-//   const id = event.target.value
-//   cartItems.filter((itemId) => itemId !== id)
-// }
-
-// const isInCart = (id) => {
-//   return cartItems.includes(id)
-// }
