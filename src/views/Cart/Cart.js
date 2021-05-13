@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import CloseIcon from './CloseIcon'
 import {
   CURRENCIES,
-  GET_CART_ITEMS,
+  CART_ITEMS,
   GET_SELECTED_CURRENCY,
 } from '../../GraphQL/queries'
 import client from '../../GraphQL/client'
@@ -21,10 +21,11 @@ import {
   CartItemStep,
   CartItemCount,
   CartItemPrice,
+  RemoveFromCart,
 } from './styles'
 
 const Cart = (props) => {
-  const { open, handleClose, refetchProducts } = props
+  const { open, handleClose, refetchProducts, products } = props
   const { data } = useQuery(CURRENCIES)
 
   const { selectedCurrency } = client.readQuery({
@@ -32,8 +33,14 @@ const Cart = (props) => {
   })
 
   const items = client.readQuery({
-    query: GET_CART_ITEMS,
+    query: CART_ITEMS,
   })
+
+  const [cartItems, setCartItems] = useState(items ? items.cartItems : [])
+
+  useEffect(() => {
+    setCartItems(items ? items.cartItems : [])
+  }, [items])
 
   const onCurrencySelect = async (event) => {
     const selected = event.target.value
@@ -46,6 +53,53 @@ const Cart = (props) => {
     })
 
     await refetchProducts(selected)
+  }
+
+  const updateQuantity = (quantity, id) => {
+    const items = client.readQuery({
+      query: CART_ITEMS,
+    })
+    if (!items) return
+
+    if (quantity > 0) {
+      const updatedCart = items.cartItems.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            product: { ...item.product, price: quantity * item.unitPrice },
+            quantity,
+          }
+        }
+
+        return item
+      })
+
+      client.writeQuery({
+        query: CART_ITEMS,
+        data: {
+          cartItems: updatedCart,
+        },
+      })
+
+      setCartItems(updatedCart)
+    }
+  }
+
+  const removeFromCart = (id) => {
+    const items = client.readQuery({
+      query: CART_ITEMS,
+    })
+    if (!items) return
+
+    const updatedCart = items.cartItems.filter((item) => item.id !== id)
+    client.writeQuery({
+      query: CART_ITEMS,
+      data: {
+        cartItems: updatedCart,
+      },
+    })
+
+    setCartItems(updatedCart)
   }
 
   return (
@@ -68,11 +122,10 @@ const Cart = (props) => {
             data.currency.map((curr) => <option value={curr}>{curr}</option>)}
         </CurrencySelect>
         <CartItemsContainer>
-          {items && items.cartItems?.length === 0 ? (
+          {cartItems?.length === 0 ? (
             <p class="empty-message">There are no items in your cart.</p>
           ) : (
-            items &&
-            items.cartItems.map((item) => (
+            cartItems.map((item) => (
               <CartItem>
                 <CartItemDetails>
                   <CartItemTitle>
@@ -80,16 +133,33 @@ const Cart = (props) => {
                   </CartItemTitle>
                   <CartItemDetailsBottom>
                     <CartItemCounterContainer>
-                      <CartItemStep>-</CartItemStep>
-                      <CartItemCount>1</CartItemCount>
-                      <CartItemStep>+</CartItemStep>
+                      <CartItemStep
+                        onClick={() =>
+                          updateQuantity(item.quantity - 1, item.id)
+                        }
+                      >
+                        -
+                      </CartItemStep>
+                      <CartItemCount>{item.quantity}</CartItemCount>
+                      <CartItemStep
+                        onClick={() =>
+                          updateQuantity(item.quantity + 1, item.id)
+                        }
+                      >
+                        +
+                      </CartItemStep>
                     </CartItemCounterContainer>
-                    <CartItemPrice>{item.product.price}</CartItemPrice>
+                    <CartItemPrice>
+                      {selectedCurrency} {item.product.price}
+                    </CartItemPrice>
                   </CartItemDetailsBottom>
                 </CartItemDetails>
                 <CartItemImage>
                   <img src={item.product.image_url} alt=""></img>
                 </CartItemImage>
+                <RemoveFromCart onClick={() => removeFromCart(item.id)}>
+                  X
+                </RemoveFromCart>
               </CartItem>
             ))
           )}

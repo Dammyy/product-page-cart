@@ -60,6 +60,7 @@ export const CartItem = styled.div`
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;
+  position: relative;
 `
 
 export const CartItemDetails = styled.div`
@@ -81,7 +82,7 @@ export const CartItemImage = styled.div`
   min-height: 100px;
   padding-right: 15px;
   align-items: center;
-  
+
   img {
     height: 80px;
   }
@@ -127,4 +128,12 @@ export const CartItemPrice = styled.div`
   height: 18px;
   font-size: 13px;
   padding: 0 10px;
+`
+
+export const RemoveFromCart = styled.div`
+  position: absolute;
+  right: 0;
+  margin-right: 12px;
+  margin-top: -10px;
+  cursor: pointer;
 `

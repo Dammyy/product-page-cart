@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import Header from '../Header'
 import {
   PRODUCTS,
-  GET_CART_ITEMS,
+  CART_ITEMS,
   GET_SELECTED_CURRENCY,
 } from '../../GraphQL/queries'
 import client from '../../GraphQL/client'
@@ -46,38 +46,48 @@ export const ProductPage = () => {
 
   const addToCart = (product) => {
     const { cartItems } = client.readQuery({
-      query: GET_CART_ITEMS,
+      query: CART_ITEMS,
     })
 
     client.writeQuery({
-      query: GET_CART_ITEMS,
+      query: CART_ITEMS,
       data: {
-        cartItems: [...cartItems, { product, quantity: 1 }],
+        cartItems: [
+          ...cartItems,
+          { id: Date.now(), product, quantity: 1, unitPrice: product.price },
+        ],
       },
     })
   }
 
   const updateCartPrice = (data) => {
     const items = client.readQuery({
-      query: GET_CART_ITEMS,
+      query: CART_ITEMS,
     })
-    // console.log('CART ITEMS ', cartItems, data)
 
     if (!items) return
 
-    const updatedCart = items.cartItems.map((item) => ({
-      product: data.products.find((product) => product.id === item.product.id),
-      quantity: item.quantity,
-    }))
+    const updatedCart = items.cartItems.map((item) => {
+      const findProduct = data.products.find(
+        (product) => product.id === item.product.id
+      )
+      return {
+        product:
+          item.quantity > 1
+            ? { ...findProduct, price: item.quantity * findProduct.price }
+            : findProduct,
+        quantity: item.quantity,
+        id: item.id,
+        unitPrice: findProduct.price,
+      }
+    })
 
     client.writeQuery({
-      query: GET_CART_ITEMS,
+      query: CART_ITEMS,
       data: {
         cartItems: updatedCart,
       },
     })
-
-    console.log('UPDATED CART', updatedCart)
   }
 
   useEffect(() => {

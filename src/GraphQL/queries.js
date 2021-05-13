@@ -22,11 +22,13 @@ export const PRODUCTS = gql`
   }
 `
 
-export const GET_CART_ITEMS = gql`
+export const CART_ITEMS = gql`
   query GetCartItems {
     cartItems @client {
+      id
       product
       quantity
+      unitPrice
     }
   }
 `

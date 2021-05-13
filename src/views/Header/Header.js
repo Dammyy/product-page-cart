@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import Cart from '../Cart'
-import { CURRENCIES } from '../../GraphQL/queries'
+import { CURRENCIES, CART_ITEMS } from '../../GraphQL/queries'
+import client from '../../GraphQL/client'
 import {
   HeaderContainer,
   HeaderInner,
@@ -14,11 +15,14 @@ import {
 
 const Header = (props) => {
   const { refetch, products } = props
+  const [isPaneOpen, setIsPaneOpen] = useState(false)
   const { error } = useQuery(CURRENCIES)
 
-  const isError = error
+  const { data } = useQuery(CART_ITEMS)
 
-  const [isPaneOpen, setIsPaneOpen] = useState(false)
+  const itemsCount = data ? data.cartItems.length : 0
+
+  const isError = error
 
   const handlePaneClose = () => {
     setIsPaneOpen(false)
@@ -44,7 +48,7 @@ const Header = (props) => {
             <CartCurrency>
               <CartContainer>
                 <CartIcon onClick={handlePaneOpen} />
-                <CartItemCount>0</CartItemCount>
+                <CartItemCount>{itemsCount}</CartItemCount>
               </CartContainer>
             </CartCurrency>
           </HeaderInnerRight>
